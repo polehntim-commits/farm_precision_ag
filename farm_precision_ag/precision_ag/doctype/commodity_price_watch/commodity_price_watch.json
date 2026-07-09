@@ -1,0 +1,114 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:commodity_name",
+ "creation": "2026-07-09 00:00:00.000000",
+ "description": "Configuration record: which USDA commodity/report to fetch prices for. One record per watch.",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "commodity_name",
+  "slug_id",
+  "report_type",
+  "market_name",
+  "is_active",
+  "column_break_status",
+  "last_fetched_at",
+  "last_record_count",
+  "section_break_notes",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "commodity_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Commodity Name",
+   "reqd": 1,
+   "unique": 1,
+   "description": "USDA commodity name to fetch, e.g. \"Cherries\", \"Sweet Cherries\"."
+  },
+  {
+   "fieldname": "slug_id",
+   "fieldtype": "Data",
+   "label": "USDA Report Slug",
+   "reqd": 1,
+   "description": "USDA MARS report slug id (e.g. \"3080\"). Find it with the report finder at mymarketnews.ams.usda.gov."
+  },
+  {
+   "fieldname": "report_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Report Type",
+   "options": "terminal_market\nshipping_point\nretail",
+   "reqd": 1,
+   "default": "terminal_market"
+  },
+  {
+   "fieldname": "market_name",
+   "fieldtype": "Data",
+   "label": "Market Name (filter)",
+   "description": "Optional. Restrict to a specific market/location. Blank = all markets in the report."
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active"
+  },
+  {
+   "fieldname": "column_break_status",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_fetched_at",
+   "fieldtype": "Datetime",
+   "label": "Last Fetched At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "last_record_count",
+   "fieldtype": "Int",
+   "label": "Last Record Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_notes",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Small Text",
+   "label": "Notes"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-09 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Precision Ag",
+ "name": "Commodity Price Watch",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Sales Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

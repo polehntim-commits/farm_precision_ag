@@ -1,0 +1,253 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-07-09 00:00:00.000000",
+ "description": "Cached price record from the USDA MARS API. Deduplicated per commodity/market/report-date/attributes.",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "commodity_price_watch",
+  "report_type",
+  "report_date",
+  "market_name",
+  "commodity_name",
+  "column_break_ids",
+  "origin",
+  "packaging",
+  "variety",
+  "grade",
+  "category",
+  "item_size",
+  "organic",
+  "section_break_prices",
+  "low_price",
+  "high_price",
+  "mostly_low_price",
+  "column_break_prices",
+  "mostly_high_price",
+  "avg_price",
+  "price_unit",
+  "is_unchanged",
+  "section_break_quality",
+  "quality",
+  "condition",
+  "appearance",
+  "column_break_quality",
+  "environment",
+  "market_tone_comments",
+  "offerings_comments",
+  "section_break_raw",
+  "raw_data",
+  "cached_at"
+ ],
+ "fields": [
+  {
+   "fieldname": "commodity_price_watch",
+   "fieldtype": "Link",
+   "label": "Commodity Price Watch",
+   "options": "Commodity Price Watch",
+   "reqd": 1
+  },
+  {
+   "fieldname": "report_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Report Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "report_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Report Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "market_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Market / Location",
+   "reqd": 1
+  },
+  {
+   "fieldname": "commodity_name",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Commodity Name"
+  },
+  {
+   "fieldname": "column_break_ids",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "origin",
+   "fieldtype": "Data",
+   "label": "Origin"
+  },
+  {
+   "fieldname": "packaging",
+   "fieldtype": "Data",
+   "label": "Packaging"
+  },
+  {
+   "fieldname": "variety",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Variety"
+  },
+  {
+   "fieldname": "grade",
+   "fieldtype": "Data",
+   "label": "Grade"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
+  },
+  {
+   "fieldname": "item_size",
+   "fieldtype": "Data",
+   "label": "Item Size"
+  },
+  {
+   "fieldname": "organic",
+   "fieldtype": "Select",
+   "label": "Organic",
+   "options": "\nY\nN"
+  },
+  {
+   "fieldname": "section_break_prices",
+   "fieldtype": "Section Break",
+   "label": "Prices"
+  },
+  {
+   "fieldname": "low_price",
+   "fieldtype": "Currency",
+   "label": "Low Price"
+  },
+  {
+   "fieldname": "high_price",
+   "fieldtype": "Currency",
+   "label": "High Price"
+  },
+  {
+   "fieldname": "mostly_low_price",
+   "fieldtype": "Currency",
+   "label": "Mostly Low Price"
+  },
+  {
+   "fieldname": "column_break_prices",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "mostly_high_price",
+   "fieldtype": "Currency",
+   "label": "Mostly High Price"
+  },
+  {
+   "fieldname": "avg_price",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Average Price"
+  },
+  {
+   "default": "per unit",
+   "fieldname": "price_unit",
+   "fieldtype": "Data",
+   "label": "Price Unit"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_unchanged",
+   "fieldtype": "Check",
+   "label": "Unchanged (carried forward)"
+  },
+  {
+   "fieldname": "section_break_quality",
+   "fieldtype": "Section Break",
+   "label": "Quality & Commentary"
+  },
+  {
+   "fieldname": "quality",
+   "fieldtype": "Data",
+   "label": "Quality"
+  },
+  {
+   "fieldname": "condition",
+   "fieldtype": "Data",
+   "label": "Condition"
+  },
+  {
+   "fieldname": "appearance",
+   "fieldtype": "Data",
+   "label": "Appearance"
+  },
+  {
+   "fieldname": "column_break_quality",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "environment",
+   "fieldtype": "Data",
+   "label": "Environment"
+  },
+  {
+   "fieldname": "market_tone_comments",
+   "fieldtype": "Small Text",
+   "label": "Market Tone"
+  },
+  {
+   "fieldname": "offerings_comments",
+   "fieldtype": "Small Text",
+   "label": "Offerings"
+  },
+  {
+   "fieldname": "section_break_raw",
+   "fieldtype": "Section Break",
+   "label": "Raw"
+  },
+  {
+   "fieldname": "raw_data",
+   "fieldtype": "JSON",
+   "label": "Raw API Data"
+  },
+  {
+   "default": "Now",
+   "fieldname": "cached_at",
+   "fieldtype": "Datetime",
+   "label": "Cached At",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-09 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Precision Ag",
+ "name": "USDA Market Price",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Sales Manager"
+  },
+  {
+   "read": 1,
+   "role": "Employee"
+  }
+ ],
+ "sort_field": "report_date",
+ "sort_order": "DESC",
+ "states": []
+}

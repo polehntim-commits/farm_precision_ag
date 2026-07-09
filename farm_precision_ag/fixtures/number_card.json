@@ -1,0 +1,15 @@
+[
+ {
+  "doctype": "Number Card",
+  "name": "Prices Fetched Today",
+  "label": "Prices Fetched Today",
+  "module": "Precision Ag",
+  "type": "Document Type",
+  "document_type": "USDA Market Price",
+  "function": "Count",
+  "is_public": 1,
+  "show_percentage_stats": 0,
+  "filters_json": "[[\"USDA Market Price\",\"cached_at\",\"Timespan\",\"today\",false]]",
+  "color": "#29CD42"
+ }
+]

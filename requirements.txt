@@ -1,0 +1,4 @@
+# farm_precision_ag relies on Frappe/ERPNext (provided by the bench
+# environment) and the `requests` library, which Frappe already vendors.
+frappe>=15.0.0
+requests

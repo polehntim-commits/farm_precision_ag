@@ -1,0 +1,104 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-07-09 00:00:00.000000",
+ "description": "Immutable log of USDA MARS API calls. Powers TTL cache decisions and debugging.",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "commodity_price_watch",
+  "query_fingerprint",
+  "report_type",
+  "column_break_meta",
+  "record_count",
+  "http_status",
+  "queried_at",
+  "section_break_error",
+  "error_message"
+ ],
+ "fields": [
+  {
+   "fieldname": "commodity_price_watch",
+   "fieldtype": "Link",
+   "label": "Commodity Price Watch",
+   "options": "Commodity Price Watch",
+   "reqd": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "query_fingerprint",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Query Fingerprint",
+   "reqd": 1,
+   "read_only": 1,
+   "description": "Cache key: {report_type}:{commodity_name}"
+  },
+  {
+   "fieldname": "report_type",
+   "fieldtype": "Data",
+   "label": "Report Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_meta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "record_count",
+   "fieldtype": "Int",
+   "label": "Record Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "http_status",
+   "fieldtype": "Int",
+   "label": "HTTP Status",
+   "read_only": 1
+  },
+  {
+   "default": "Now",
+   "fieldname": "queried_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Queried At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_error",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Small Text",
+   "label": "Error Message",
+   "read_only": 1
+  }
+ ],
+ "in_create": 1,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-07-09 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Precision Ag",
+ "name": "USDA Query Log",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "Sales Manager"
+  }
+ ],
+ "sort_field": "queried_at",
+ "sort_order": "DESC",
+ "states": []
+}

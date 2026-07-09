@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include farm_precision_ag *.css
+recursive-include farm_precision_ag *.csv
+recursive-include farm_precision_ag *.html
+recursive-include farm_precision_ag *.ico
+recursive-include farm_precision_ag *.js
+recursive-include farm_precision_ag *.json
+recursive-include farm_precision_ag *.md
+recursive-include farm_precision_ag *.png
+recursive-include farm_precision_ag *.py
+recursive-include farm_precision_ag *.svg
+recursive-include farm_precision_ag *.txt
+recursive-exclude farm_precision_ag *.pyc
