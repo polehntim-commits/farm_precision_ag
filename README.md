@@ -10,7 +10,7 @@ Market News (MARS) API, browsable in the desk. Land / Blocks / Fields /
 Implements / Spray / Attestations / Costing arrive in later phases (A, C, D, E,
 F) and are intentionally **not** in this app yet.
 
-Version: **0.3.0**
+Version: **0.4.0**
 
 ---
 
@@ -159,12 +159,34 @@ the whitelisted `generate_charts_api` are wired in `hooks.py` /
 
 | Item | Breakdown | Source | Use |
 | ---- | --------- | ------ | --- |
-| **Shipping Point by Size** | avg price per `item_size` | shipping_point | Sizing/packing decisions. |
-| **Shipping Point by Variety** | avg price per `variety` | shipping_point | Variety price differentiation. |
-| **Terminal Market by Origin** | avg price per `origin` | terminal_market | Competing supply origins & what they fetch downstream. |
+| **Shipping Point by Size** | one line per `item_size` over time | shipping_point | Sizing/packing decisions. |
+| **Shipping Point by Variety** | one line per `variety` over time | shipping_point | Variety price differentiation. |
+| **Terminal Market by Origin** | one line per `origin` over time | terminal_market | Competing supply origins & what they fetch downstream. |
 | **Weekly Average (Trend)** | avg `avg_price`, weekly time series | shipping_point | Season trend line. |
 | **Latest Shipping Price (card)** | avg `avg_price`, last week | shipping_point | Headline "what's it worth now" number. |
 | **Records Cached (card)** | count | (all report types) | How much data you have for this commodity. |
+
+The three grouped charts (by size / variety / origin) are **multi-line
+time-series** — each distinct size/variety/origin is its own line trending over
+report dates. They're powered internally by a Script Report (see below); the
+Weekly Average stays a plain DocType-based chart (single time series). The
+chart-factory API is unchanged from the user's perspective — new Watches still
+auto-generate the same named set.
+
+### Grouped charts run on a Script Report
+
+The by-size / by-variety / by-origin charts don't read the DocType directly.
+They're **Report-based Dashboard Charts** backed by the **USDA Price Trend by
+Grouping** Script Report, which pivots the data (one column per group value, one
+row per date) and returns its own multi-line chart. Each chart sets
+`use_report_chart = 1` and passes its parameters through `filters_json`
+(`commodity_name`, `report_type`, `group_by`) so it renders with no user
+interaction.
+
+That report is also a **standalone view**: open
+`/app/query-report/USDA Price Trend by Grouping` and set your own filters
+(commodity, report type, grouping field, date range) to explore any pivot — the
+same engine that feeds the charts, usable directly as a table + chart.
 
 ### Why shipping point is the primary signal
 
@@ -177,13 +199,20 @@ downstream market is bearing against your shipping-point price.
 
 ### Schema notes (Frappe v15)
 
-- `chart_type` is the *data mode* (`Group By` / `Average` / `Count` / …);
-  `type` is the *visual* (`Bar` / `Line` / …). They're easy to conflate.
-- Frappe's native Dashboard Chart has **no grouped time-series** (one line per
-  group over time — that was Farm App's custom Chart.js). So the by-Size /
-  by-Variety / by-Origin charts are **Group By bar charts** (one bar per group
-  value showing the average), which is also the only way to keep those three
-  distinct. Only **Weekly Average** is a true time series.
+- `chart_type` is the *data mode* (`Report` / `Average` / `Group By` / `Count`
+  / …); `type` is the *visual* (`Line` / `Bar` / …). They're easy to conflate,
+  and there is **no** `data_source_type` field — `chart_type="Report"` is what
+  selects a Report source.
+- Frappe v15 can't do grouped time-series from a DocType source: a chart with
+  `Group By` + `timeseries=1` renders a **flat line at 0** (the "Group of
+  Groups" combination is unsupported). So the by-Size / by-Variety / by-Origin
+  charts are **Report-based** (`chart_type="Report"`, `use_report_chart=1`)
+  backed by the **USDA Price Trend by Grouping** Script Report, which pivots the
+  data and returns its own multi-line chart. `use_report_chart` is required
+  because the series columns are discovered dynamically per commodity — they
+  can't be listed in the `y_axis` child table ahead of time.
+- Only **Weekly Average** stays DocType-based — a single `chart_type="Average"`
+  time series, which works fine.
 - Charts filter on `commodity_name = <watch commodity>` (exact match). If USDA
   labels the same fruit two ways (e.g. "Cherries" vs "Sweet Cherries"), create a
   Watch for each — every Watch gets its own scoped chart set.
@@ -244,11 +273,10 @@ so a partial commodity name usually still resolves.
 
 ## Follow-ups (not in this release)
 
-- **Grouped time series.** The by-size / by-variety / by-origin charts are
-  generated as Group By bar charts because stock Frappe can't do
-  multi-line-per-group over time. A true grouped time-series (Farm App's
-  Chart.js look) would need a custom chart source or a Query Report backing a
-  Report-type Dashboard Chart.
+- **Grouped time series — done (0.4.0).** The by-size / by-variety / by-origin
+  charts are now true multi-line-per-group time series, powered by the **USDA
+  Price Trend by Grouping** Script Report backing Report-type Dashboard Charts
+  (the "Query Report backing a Report-type chart" path noted here previously).
 - **BEP overlay.** Overlaying terminal-market price on the shipping-point trend
   for a live break-even read is a natural next chart.
 - Bake this app into the `fafo-erpnext` image (separate task, following the

@@ -13,8 +13,13 @@ app_version = "0.1.0"
 # Ship the workspace's generic "Prices Fetched Today" Number Card so the tile
 # renders. Commodity-specific charts/cards are NOT shipped as fixtures — they're
 # generated per Commodity Price Watch by the chart factory (see doc_events).
+#
+# The "USDA Price Trend by Grouping" Script Report is is_standard and lives in
+# code (report folder), so it loads on migrate automatically; the fixture entry
+# just keeps it exportable/round-trippable alongside the app.
 fixtures = [
     {"dt": "Number Card", "filters": [["name", "in", ["Prices Fetched Today"]]]},
+    {"dt": "Report", "filters": [["name", "=", "USDA Price Trend by Grouping"]]},
 ]
 
 # ---------------------------------------------------------------------------

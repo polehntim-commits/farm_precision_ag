@@ -2,3 +2,4 @@
 
 [post_model_sync]
 farm_precision_ag.patches.v0_3_0_backfill_charts
+farm_precision_ag.patches.v0_4_0_regenerate_charts

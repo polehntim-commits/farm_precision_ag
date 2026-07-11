@@ -17,13 +17,19 @@ The two similarly-named fields are easy to conflate:
   * ``type``        = the *visual*: Line / Bar / Percentage / Pie / Donut /
                       Heatmap.
 
-Stock Frappe has **no grouped time-series** (one line per group over time —
-that was Farm App's custom Chart.js). So the by-Size / by-Variety / by-Origin
-charts are built as ``chart_type="Group By"`` bar charts (one bar per group
-value showing the average price), which is the native way to keep the
-per-group breakdown *and* the only way to keep those three charts distinct
-(as single-series time-lines they'd be identical). Only the Weekly Average is
-a true ``chart_type="Average"`` time series.
+Grouped time-series (one line per group over time) is where stock Frappe v15
+falls down: a DocType-based chart with ``Group By`` + ``timeseries=1`` renders
+a *flat line at 0* — the "Group of Groups" combination isn't supported. So the
+by-Size / by-Variety / by-Origin charts are built as **Report-based** charts
+(``chart_type="Report"``) backed by the ``USDA Price Trend by Grouping`` Script
+Report, which pivots the data itself and returns a ready-made multi-line chart.
+Those charts set ``use_report_chart=1`` so they render the report's own chart
+rather than trying to auto-build one from ``x_field``/``y_axis`` (impossible
+here — the per-group series columns are discovered dynamically per commodity,
+so they can't be listed ahead of time).
+
+Only the Weekly Average stays a DocType-based chart: it's a single time series
+with no grouping (``chart_type="Average"``, ``timeseries=1``), which works fine.
 
 Generated docs deliberately leave ``module`` unset so they're treated as
 site/user data, not app-shipped fixtures.
@@ -36,6 +42,7 @@ import frappe
 CHART_DOCTYPE = "Dashboard Chart"
 CARD_DOCTYPE = "Number Card"
 SOURCE_DOCTYPE = "USDA Market Price"
+TREND_REPORT = "USDA Price Trend by Grouping"
 
 
 # ── Public API ───────────────────────────────────────────────────────────
@@ -203,58 +210,76 @@ def _commodity_filter(commodity: str, report_type: str = None) -> list:
 # ── Chart spec builders (parameterized by commodity) ─────────────────────
 
 
-def _shipping_point_by_size_spec(commodity: str) -> dict:
+def _report_chart_spec(
+    commodity: str,
+    report_type: str,
+    group_by: str,
+    name_suffix: str,
+    chart_type: str = "Line",
+) -> dict:
+    """Build a Report-based Dashboard Chart backed by the trend Script Report.
+
+    The three grouped charts are multi-line time series, which stock Frappe v15
+    can't produce from a DocType source (``Group By`` + ``timeseries`` renders a
+    flat line at 0). Instead they read from the ``USDA Price Trend by Grouping``
+    Script Report, which pivots the data and returns its own multi-line chart.
+
+    Field notes (verified against the v15 Dashboard Chart schema):
+      * ``chart_type="Report"``  — the *data mode* (not the visual). This is the
+        field that selects a Report source; there is no ``data_source_type``.
+      * ``type``                 — the *visual* (Line).
+      * ``report_name``          — the backing Report.
+      * ``use_report_chart=1``   — render the chart the report returns. Required
+        here: the y-series columns are discovered dynamically per commodity, so
+        we can't populate the ``y_axis`` child table with static fieldnames.
+      * ``filters_json``         — for Report charts this is a *dict* of report
+        filters (not the ``[[doctype, field, op, val, meta]]`` list used by
+        DocType charts). It pre-populates the report so the chart "just works"
+        with no user interaction.
+    """
     return {
-        "name": f"USDA {commodity} - Shipping Point by Size",
-        "chart_name": f"USDA {commodity} — Shipping Point by Size",
-        "chart_type": "Group By",
-        "type": "Bar",
-        "document_type": SOURCE_DOCTYPE,
-        "group_by_based_on": "item_size",
-        "group_by_type": "Average",
-        "aggregate_function_based_on": "avg_price",
-        "number_of_groups": 0,
-        "timeseries": 0,
+        "name": f"USDA {commodity} - {name_suffix}",
+        "chart_name": f"USDA {commodity} — {name_suffix}",
+        "chart_type": "Report",
+        "type": chart_type,
+        "report_name": TREND_REPORT,
+        "use_report_chart": 1,
+        "filters_json": json.dumps(
+            {
+                "commodity_name": commodity,
+                "report_type": report_type,
+                "group_by": group_by,
+            }
+        ),
         "is_public": 1,
-        "filters_json": json.dumps(_commodity_filter(commodity, "shipping_point")),
-        "color": "#449CF0",
     }
+
+
+def _shipping_point_by_size_spec(commodity: str) -> dict:
+    return _report_chart_spec(
+        commodity=commodity,
+        report_type="shipping_point",
+        group_by="item_size",
+        name_suffix="Shipping Point by Size",
+    )
 
 
 def _shipping_point_by_variety_spec(commodity: str) -> dict:
-    return {
-        "name": f"USDA {commodity} - Shipping Point by Variety",
-        "chart_name": f"USDA {commodity} — Shipping Point by Variety",
-        "chart_type": "Group By",
-        "type": "Bar",
-        "document_type": SOURCE_DOCTYPE,
-        "group_by_based_on": "variety",
-        "group_by_type": "Average",
-        "aggregate_function_based_on": "avg_price",
-        "number_of_groups": 0,
-        "timeseries": 0,
-        "is_public": 1,
-        "filters_json": json.dumps(_commodity_filter(commodity, "shipping_point")),
-        "color": "#ED6396",
-    }
+    return _report_chart_spec(
+        commodity=commodity,
+        report_type="shipping_point",
+        group_by="variety",
+        name_suffix="Shipping Point by Variety",
+    )
 
 
 def _terminal_market_by_origin_spec(commodity: str) -> dict:
-    return {
-        "name": f"USDA {commodity} - Terminal Market by Origin",
-        "chart_name": f"USDA {commodity} — Terminal Market by Origin",
-        "chart_type": "Group By",
-        "type": "Bar",
-        "document_type": SOURCE_DOCTYPE,
-        "group_by_based_on": "origin",
-        "group_by_type": "Average",
-        "aggregate_function_based_on": "avg_price",
-        "number_of_groups": 0,
-        "timeseries": 0,
-        "is_public": 1,
-        "filters_json": json.dumps(_commodity_filter(commodity, "terminal_market")),
-        "color": "#FFB829",
-    }
+    return _report_chart_spec(
+        commodity=commodity,
+        report_type="terminal_market",
+        group_by="origin",
+        name_suffix="Terminal Market by Origin",
+    )
 
 
 def _weekly_average_spec(commodity: str) -> dict:
