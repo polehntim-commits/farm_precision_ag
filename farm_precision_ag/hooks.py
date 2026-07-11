@@ -10,22 +10,26 @@ app_email = "polehntim@gmail.com"
 app_license = "MIT"
 app_version = "0.1.0"
 
-# Ship the workspace's Dashboard Charts + Number Cards so the tiles render.
-# Filtered by name so `bench --site frontend export-fixtures --app
-# farm_precision_ag` re-syncs cleanly if we edit these via the UI later.
+# Ship the workspace's generic "Prices Fetched Today" Number Card so the tile
+# renders. Commodity-specific charts/cards are NOT shipped as fixtures — they're
+# generated per Commodity Price Watch by the chart factory (see doc_events).
 fixtures = [
-    {"dt": "Dashboard Chart", "filters": [["name", "in", [
-        "USDA Cherries - Shipping Point by Size",
-        "USDA Cherries - Shipping Point by Variety",
-        "USDA Cherries - Terminal Market by Origin",
-        "USDA Cherries - Weekly Average",
-    ]]]},
-    {"dt": "Number Card", "filters": [["name", "in", [
-        "Prices Fetched Today",
-        "USDA Cherries Latest Shipping Price",
-        "USDA Records Cached",
-    ]]]},
+    {"dt": "Number Card", "filters": [["name", "in", ["Prices Fetched Today"]]]},
 ]
+
+# ---------------------------------------------------------------------------
+# doc_events: chart factory.
+#
+# Every Commodity Price Watch gets its own set of 4 Dashboard Charts + 2 Number
+# Cards, generated on insert and cleaned up on delete. The handlers fail soft
+# (log_error, never raise) so a factory hiccup can't block a Watch save/delete.
+# ---------------------------------------------------------------------------
+doc_events = {
+    "Commodity Price Watch": {
+        "after_insert": "farm_precision_ag.utils.chart_factory._auto_generate_after_insert",
+        "on_trash": "farm_precision_ag.utils.chart_factory._auto_cleanup_before_trash",
+    },
+}
 
 # ---------------------------------------------------------------------------
 # Scheduler events

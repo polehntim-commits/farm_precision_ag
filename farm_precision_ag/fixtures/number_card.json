@@ -11,32 +11,5 @@
   "show_percentage_stats": 0,
   "filters_json": "[[\"USDA Market Price\",\"cached_at\",\"Timespan\",\"today\",false]]",
   "color": "#29CD42"
- },
- {
-  "doctype": "Number Card",
-  "name": "USDA Cherries Latest Shipping Price",
-  "label": "Latest Cherry Shipping Price (avg)",
-  "module": "Precision Ag",
-  "type": "Document Type",
-  "document_type": "USDA Market Price",
-  "function": "Average",
-  "aggregate_function_based_on": "avg_price",
-  "is_public": 1,
-  "show_percentage_stats": 0,
-  "filters_json": "[[\"USDA Market Price\",\"report_type\",\"=\",\"shipping_point\",false],[\"USDA Market Price\",\"commodity_name\",\"like\",\"%Cherr%\",false],[\"USDA Market Price\",\"report_date\",\"Timespan\",\"last week\",false]]",
-  "color": "#449CF0"
- },
- {
-  "doctype": "Number Card",
-  "name": "USDA Records Cached",
-  "label": "USDA Records Cached",
-  "module": "Precision Ag",
-  "type": "Document Type",
-  "document_type": "USDA Market Price",
-  "function": "Count",
-  "is_public": 1,
-  "show_percentage_stats": 0,
-  "filters_json": "[]",
-  "color": "#7575FF"
  }
 ]
