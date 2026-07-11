@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"pahdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Precision Ag \\u2014 USDA Market Pricing</span>\",\"col\":12}},{\"id\":\"panc1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Prices Fetched Today\",\"col\":4}},{\"id\":\"pasc1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Market Price\",\"col\":4}},{\"id\":\"pasc2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Commodity Price Watch\",\"col\":4}},{\"id\":\"pasc3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Query Log\",\"col\":4}}]",
+ "content": "[{\"id\":\"pahdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Precision Ag \\u2014 USDA Market Pricing</span>\",\"col\":12}},{\"id\":\"panc1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Prices Fetched Today\",\"col\":4}},{\"id\":\"pasc1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Market Price\",\"col\":4}},{\"id\":\"pasc2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Commodity Price Watch\",\"col\":4}},{\"id\":\"pasc3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Query Log\",\"col\":4}},{\"id\":\"pacfghdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Configuration</span>\",\"col\":12}},{\"id\":\"pasc4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Settings\",\"col\":4}}]",
  "creation": "2026-07-09 00:00:00.000000",
  "docstatus": 0,
  "doctype": "Workspace",
@@ -48,6 +48,24 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Configuration",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "USDA Settings",
+   "link_count": 0,
+   "link_to": "USDA Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
  "modified": "2026-07-09 00:00:00.000000",
@@ -88,6 +106,13 @@
    "doc_view": "List",
    "label": "USDA Query Log",
    "link_to": "USDA Query Log",
+   "stats_filter": "{}",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "label": "USDA Settings",
+   "link_to": "USDA Settings",
    "stats_filter": "{}",
    "type": "DocType"
   }

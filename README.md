@@ -10,7 +10,7 @@ Market News (MARS) API, browsable in the desk. Land / Blocks / Fields /
 Implements / Spray / Attestations / Costing arrive in later phases (A, C, D, E,
 F) and are intentionally **not** in this app yet.
 
-Version: **0.1.0**
+Version: **0.2.0**
 
 ---
 
@@ -22,10 +22,15 @@ Version: **0.1.0**
 - **USDA Market Price** — cached price rows pulled from the MARS API,
   de-duplicated per commodity / market / report-date / attributes.
 - **USDA Query Log** — an immutable log of every API call (record counts, HTTP
-  status, errors). Powers the 6-hour TTL cache and debugging.
+  status, errors). Powers the TTL cache and debugging.
+- **USDA Settings** — a Single DocType (Precision Ag → Configuration) that holds
+  the API key, base URL, TTL, timeout, attribution text, and live pull status.
+  The primary, UI-managed source of configuration (see **Configuration** below).
 - A **Precision Ag** workspace with shortcut tiles and a "Prices Fetched Today"
   number card.
-- A **daily scheduler** that refreshes every active watch automatically.
+- A **daily scheduler** that refreshes every active watch automatically and
+  writes its outcome back to USDA Settings (last successful pull, status,
+  cached-record count).
 
 ---
 
@@ -37,16 +42,15 @@ Request a free key at
 <https://mymarketnews.ams.usda.gov/mymarketnews-api>. It arrives by email and is
 used as the HTTP Basic **username** (password is blank).
 
-### 2. Add the key to your site config
+### 2. Add the key (see Configuration below)
 
-```bash
-bench --site frontend set-config usda_api_key "YOUR_KEY_HERE"
-```
+**Preferred:** in the desk, go to **Precision Ag → Configuration → USDA
+Settings**, paste the key into **API Key**, and **Save**. See
+[Configuration](#configuration) for details.
 
-(or add `"usda_api_key": "YOUR_KEY_HERE"` to the site's `site_config.json`).
-
-The app reads it via `frappe.conf.get("usda_api_key")`. Without it, the daily
-pull logs a skip and does nothing.
+**Legacy fallback:** `bench --site frontend set-config usda_api_key "YOUR_KEY"`
+still works if USDA Settings has no key. Without a key from either source, the
+daily pull logs a skip and does nothing.
 
 ### 3. Create a Commodity Price Watch
 
@@ -78,6 +82,51 @@ tracked via USDA Query Log). Make sure the bench scheduler is enabled:
 ```bash
 bench --site frontend enable-scheduler
 ```
+
+---
+
+## Configuration
+
+All USDA integration settings live on the **USDA Settings** Single DocType
+(**Precision Ag → Configuration → USDA Settings**). This is the primary source
+of truth; `site_config.json` remains a fallback for the API key only.
+
+### API key
+
+- **Preferred:** open **USDA Settings**, paste your key into **API Key**, and
+  **Save**. Once a key is saved here, it becomes the source of truth and the
+  scheduler/client read from it.
+- **Legacy:** `bench --site <site> set-config usda_api_key '...'` still works as
+  a fallback when USDA Settings has no key. Precedence is: USDA Settings →
+  `site_config.json` → none.
+- **Rotating the key:** just paste the new value and Save — no container SSH or
+  `bench` restart needed. `API Key Last Rotated` is stamped automatically.
+- **Storage & access:** the key is a Frappe **Password** field — encrypted at
+  rest and never returned through the API. It carries `permlevel: 1`, so only
+  **System Manager** can view or edit it. HR Manager and Sales Manager can read
+  the rest of USDA Settings (attribution, status) but **not** the key.
+
+### Test Connection
+
+The **Test Connection** button (top-right **Actions** menu on USDA Settings)
+makes one lightweight call to the `/reports` endpoint to verify auth and
+connectivity. It proves the key works **without** pulling any commodity data,
+and reports a clear message on `401 invalid key` vs other failures.
+
+### Other settings
+
+| Field                     | Purpose                                                                 |
+| ------------------------- | ----------------------------------------------------------------------- |
+| API Base URL              | MARS endpoint. Change only if USDA moves it or you route via a proxy.   |
+| Attribution Text          | Shown in reports/UI (default "Data from USDA Agricultural Marketing Service"). |
+| Request Timeout (seconds) | Per-request HTTP timeout (default 30).                                  |
+| Request TTL (hours)       | How long cached data is trusted before re-querying (default 6).         |
+
+### Status (read-only)
+
+After each scheduled pull the client writes back **Last Successful Pull**,
+**Last Pull Status** (`success` / `error` / `no-data`), **Last Error Message**,
+and **Total Records Cached** — a quick health view without tailing logs.
 
 ---
 

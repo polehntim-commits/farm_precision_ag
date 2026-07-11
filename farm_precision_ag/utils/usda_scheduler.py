@@ -10,6 +10,9 @@ lives in ``usda_client.should_refresh_watch``.
 import frappe
 
 from farm_precision_ag.utils.usda_client import get_api_key, refresh_all_active_watches
+from farm_precision_ag.precision_ag.doctype.usda_settings.usda_settings import (
+    record_pull_result,
+)
 
 
 def run_daily_pull() -> dict:
@@ -24,11 +27,16 @@ def run_daily_pull() -> dict:
     """
     if not get_api_key():
         frappe.logger("farm_precision_ag").info(
-            "USDA daily pull skipped — no usda_api_key configured in site config."
+            "USDA daily pull skipped — no API key configured (USDA Settings or site config)."
         )
+        record_pull_result("no-data", error_message="No USDA API key configured.")
         return {"status": "skipped", "reason": "no_api_key", "watches": 0, "stored": 0}
 
-    summaries = refresh_all_active_watches()
+    try:
+        summaries = refresh_all_active_watches()
+    except Exception as e:
+        record_pull_result("error", error_message=str(e))
+        raise
 
     stored = sum(s.get("stored", 0) for s in summaries if not s.get("error"))
     errors = [s for s in summaries if s.get("error")]
@@ -36,6 +44,18 @@ def run_daily_pull() -> dict:
         f"USDA daily pull done: {len(summaries)} watch(es), "
         f"{stored} price(s) stored, {len(errors)} error(s)."
     )
+
+    # Record the outcome on USDA Settings so admins can see pull health in the UI.
+    if errors:
+        first_err = next((s.get("error") for s in errors if s.get("error")), "")
+        record_pull_result(
+            "error",
+            error_message=f"{len(errors)} watch error(s). First: {first_err}",
+            records_added=stored,
+        )
+    else:
+        record_pull_result("success", records_added=stored)
+
     return {
         "status": "ok",
         "watches": len(summaries),

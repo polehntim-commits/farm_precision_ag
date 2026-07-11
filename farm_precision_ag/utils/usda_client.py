@@ -9,8 +9,9 @@ API docs: https://mymarketnews.ams.usda.gov/mymarketnews-api
 Base URL:  https://marsapi.ams.usda.gov/services/v1.2/reports/{slug_id}
 Auth:      HTTP Basic — username = API key, password = empty string
 
-The API key is read from the site config (``frappe.conf.get("usda_api_key")``),
-which replaces the Flask config / encrypted-Settings injection in the Farm App.
+The API key and other tunables (base URL, TTL, timeout) are read via the getters
+on the USDA Settings DocType, which prefer the UI-managed values and fall back to
+``site_config.json`` ("usda_api_key") / defaults.
 """
 
 import base64
@@ -27,12 +28,18 @@ from frappe.utils import now_datetime
 from farm_precision_ag.precision_ag.doctype.usda_market_price.usda_market_price import (
     DEDUP_FIELDS,
 )
+from farm_precision_ag.precision_ag.doctype.usda_settings.usda_settings import (
+    get_api_key,
+    get_base_url,
+    get_ttl_seconds,
+    get_timeout_seconds,
+)
 
 logger = logging.getLogger(__name__)
 
-# Minimum hours between live API calls for the same (report_type:commodity)
-# fingerprint. Matches the brief's 6-hour TTL. The Farm App made this
-# per-watch; Phase B keeps it a single constant for simplicity.
+# Fallback TTL between live API calls for the same (report_type:commodity)
+# fingerprint. The effective value comes from USDA Settings via
+# get_ttl_seconds(); this constant is only the last-resort default.
 CACHE_TTL_HOURS = 6
 
 
@@ -45,9 +52,12 @@ class USDAMarketNewsClient:
 
     BASE_URL = "https://marsapi.ams.usda.gov/services/v1.2/reports"
 
-    def __init__(self, api_key: str, timeout: int = 30):
+    def __init__(self, api_key: str, timeout: int | None = None, base_url: str | None = None):
         self.api_key = api_key
-        self.timeout = timeout
+        # Both timeout and base URL are user-configurable via USDA Settings;
+        # fall back to the getters (which themselves fall back to defaults).
+        self.timeout = timeout if timeout is not None else get_timeout_seconds()
+        self.BASE_URL = base_url or get_base_url()
 
     # -- public ---------------------------------------------------------------
 
@@ -470,16 +480,16 @@ class USDAMarketNewsClient:
 
 
 # ---------------------------------------------------------------------------
-# Site config / API key
+# API key / config
 # ---------------------------------------------------------------------------
-
-def get_api_key() -> str | None:
-    """Read the USDA MARS API key from the site config.
-
-    Set it with ``bench --site <site> set-config usda_api_key "abc123"`` or by
-    adding ``"usda_api_key": "abc123"`` to ``site_config.json``.
-    """
-    return frappe.conf.get("usda_api_key")
+#
+# ``get_api_key``, ``get_base_url``, ``get_ttl_seconds`` and
+# ``get_timeout_seconds`` now live on the USDA Settings controller and are
+# imported at the top of this module. They are re-exported here so existing
+# callers (e.g. usda_scheduler) that do
+# ``from farm_precision_ag.utils.usda_client import get_api_key`` keep working.
+# The effective API key comes from USDA Settings first, then site_config.json
+# ("usda_api_key") as a legacy fallback.
 
 
 # ---------------------------------------------------------------------------
@@ -514,7 +524,7 @@ def should_refresh_watch(watch) -> bool:
         return True
     last = frappe.utils.get_datetime(rows[0].queried_at)
     age = now_datetime() - last
-    return age > timedelta(hours=CACHE_TTL_HOURS)
+    return age > timedelta(seconds=get_ttl_seconds())
 
 
 def log_query(watch_name: str, fingerprint: str, report_type: str, result: dict) -> None:
@@ -732,7 +742,7 @@ def refresh_watch(watch) -> dict:
     """
     api_key = get_api_key()
     if not api_key:
-        return {"status": "error", "error": "No usda_api_key configured in site config."}
+        return {"status": "error", "error": "No USDA API key configured (USDA Settings or site config)."}
 
     if not should_refresh_watch(watch):
         return {"status": "cached", "stored": 0}
@@ -759,7 +769,7 @@ def refresh_all_active_watches() -> list[dict]:
     api_key = get_api_key()
     if not api_key:
         frappe.log_error(
-            "USDA daily pull skipped: no usda_api_key in site config.",
+            "USDA daily pull skipped: no API key in USDA Settings or site config.",
             "farm_precision_ag usda_client",
         )
         return []
