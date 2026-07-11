@@ -60,4 +60,21 @@ scheduler_events = {
 # ---------------------------------------------------------------------------
 after_migrate = [
     "farm_precision_ag.utils.workspace_sync.refresh_precision_ag_workspace",
+    # Re-assert the Report.execute_module list-filter normalizer on migrate, in
+    # case boot_session hasn't fired yet on a fresh deploy. Idempotent.
+    "farm_precision_ag.utils.patches.patch_report_execute_module",
 ]
+
+# ---------------------------------------------------------------------------
+# boot_session: install runtime monkey-patches.
+#
+# Called on every /desk request, so the Report.execute_module list-of-lists
+# filter normalizer is active before any Script Report chart is rendered. The
+# patch is idempotent (guarded by Report._farm_precision_ag_patched), so calling
+# it every request is a no-op after the first. The hooked function accepts the
+# bootinfo arg Frappe passes and ignores it.
+#
+# See farm_precision_ag.utils.patches for the rationale (Dashboard/Script-Report
+# co-render ValueError crash).
+# ---------------------------------------------------------------------------
+boot_session = "farm_precision_ag.utils.patches.patch_report_execute_module"
