@@ -10,9 +10,21 @@ app_email = "polehntim@gmail.com"
 app_license = "MIT"
 app_version = "0.1.0"
 
-# Ship the workspace's "Prices Fetched Today" Number Card so the tile renders.
+# Ship the workspace's Dashboard Charts + Number Cards so the tiles render.
+# Filtered by name so `bench --site frontend export-fixtures --app
+# farm_precision_ag` re-syncs cleanly if we edit these via the UI later.
 fixtures = [
-    {"dt": "Number Card", "filters": [["name", "in", ["Prices Fetched Today"]]]},
+    {"dt": "Dashboard Chart", "filters": [["name", "in", [
+        "USDA Cherries - Shipping Point by Size",
+        "USDA Cherries - Shipping Point by Variety",
+        "USDA Cherries - Terminal Market by Origin",
+        "USDA Cherries - Weekly Average",
+    ]]]},
+    {"dt": "Number Card", "filters": [["name", "in", [
+        "Prices Fetched Today",
+        "USDA Cherries Latest Shipping Price",
+        "USDA Records Cached",
+    ]]]},
 ]
 
 # ---------------------------------------------------------------------------

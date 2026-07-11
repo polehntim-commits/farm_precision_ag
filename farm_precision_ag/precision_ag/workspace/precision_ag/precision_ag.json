@@ -1,6 +1,23 @@
 {
- "charts": [],
- "content": "[{\"id\":\"pahdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Precision Ag \\u2014 USDA Market Pricing</span>\",\"col\":12}},{\"id\":\"panc1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Prices Fetched Today\",\"col\":4}},{\"id\":\"pasc1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Market Price\",\"col\":4}},{\"id\":\"pasc2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Commodity Price Watch\",\"col\":4}},{\"id\":\"pasc3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Query Log\",\"col\":4}},{\"id\":\"pacfghdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Configuration</span>\",\"col\":12}},{\"id\":\"pasc4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Settings\",\"col\":4}}]",
+ "charts": [
+  {
+   "chart_name": "USDA Cherries - Shipping Point by Size",
+   "label": "USDA Cherries \u2014 Shipping Point by Size"
+  },
+  {
+   "chart_name": "USDA Cherries - Shipping Point by Variety",
+   "label": "USDA Cherries \u2014 Shipping Point by Variety"
+  },
+  {
+   "chart_name": "USDA Cherries - Terminal Market by Origin",
+   "label": "USDA Cherries \u2014 Terminal Market by Origin"
+  },
+  {
+   "chart_name": "USDA Cherries - Weekly Average",
+   "label": "USDA Cherries \u2014 Weekly Average"
+  }
+ ],
+ "content": "[{\"id\":\"pahdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Precision Ag \\u2014 USDA Market Pricing</span>\",\"col\":12}},{\"id\":\"panc1\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"USDA Cherries Latest Shipping Price\",\"col\":6}},{\"id\":\"panc2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"USDA Records Cached\",\"col\":6}},{\"id\":\"pamihdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">USDA Market Insights</span>\",\"col\":12}},{\"id\":\"pach1\",\"type\":\"chart\",\"data\":{\"chart_name\":\"USDA Cherries - Shipping Point by Size\",\"col\":6}},{\"id\":\"pach2\",\"type\":\"chart\",\"data\":{\"chart_name\":\"USDA Cherries - Shipping Point by Variety\",\"col\":6}},{\"id\":\"pach3\",\"type\":\"chart\",\"data\":{\"chart_name\":\"USDA Cherries - Terminal Market by Origin\",\"col\":6}},{\"id\":\"pach4\",\"type\":\"chart\",\"data\":{\"chart_name\":\"USDA Cherries - Weekly Average\",\"col\":6}},{\"id\":\"pacfghdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Configuration</span>\",\"col\":12}},{\"id\":\"pasc4\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Settings\",\"col\":4}},{\"id\":\"padatahdr\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Data</span>\",\"col\":12}},{\"id\":\"pasc1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Market Price\",\"col\":4}},{\"id\":\"pasc2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Commodity Price Watch\",\"col\":4}},{\"id\":\"pasc3\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"USDA Query Log\",\"col\":4}}]",
  "creation": "2026-07-09 00:00:00.000000",
  "docstatus": 0,
  "doctype": "Workspace",
@@ -68,14 +85,18 @@
    "type": "Link"
   }
  ],
- "modified": "2026-07-09 00:00:00.000000",
+ "modified": "2026-07-11 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Precision Ag",
  "name": "Precision Ag",
  "number_cards": [
   {
-   "label": "Prices Fetched Today",
-   "number_card_name": "Prices Fetched Today"
+   "label": "Latest Cherry Shipping Price (avg)",
+   "number_card_name": "USDA Cherries Latest Shipping Price"
+  },
+  {
+   "label": "USDA Records Cached",
+   "number_card_name": "USDA Records Cached"
   }
  ],
  "owner": "Administrator",

@@ -10,7 +10,7 @@ Market News (MARS) API, browsable in the desk. Land / Blocks / Fields /
 Implements / Spray / Attestations / Costing arrive in later phases (A, C, D, E,
 F) and are intentionally **not** in this app yet.
 
-Version: **0.2.0**
+Version: **0.3.0**
 
 ---
 
@@ -26,8 +26,9 @@ Version: **0.2.0**
 - **USDA Settings** — a Single DocType (Precision Ag → Configuration) that holds
   the API key, base URL, TTL, timeout, attribution text, and live pull status.
   The primary, UI-managed source of configuration (see **Configuration** below).
-- A **Precision Ag** workspace with shortcut tiles and a "Prices Fetched Today"
-  number card.
+- A **Precision Ag** workspace with shortcut tiles, packaged **Dashboard
+  Charts** and **Number Cards** that visualize the cached USDA prices out of the
+  box (see **Charts & Dashboards** below).
 - A **daily scheduler** that refreshes every active watch automatically and
   writes its outcome back to USDA Settings (last successful pull, status,
   cached-record count).
@@ -130,6 +131,63 @@ and **Total Records Cached** — a quick health view without tailing logs.
 
 ---
 
+## Charts & Dashboards
+
+The Precision Ag workspace ships packaged **Dashboard Charts** and **Number
+Cards** so the cached USDA data is visualized the moment you land on it — no
+manual setup. They live under the **USDA Market Insights** section.
+
+### Why shipping point is the primary signal
+
+**Shipping-point (F.O.B.) price is the grower's decision signal** — it's what
+the packing shed is actually being paid at origin, so it drives
+sort/pack/ship-now-vs-hold calls. That's why three of the four charts and the
+headline number card are built on `report_type = shipping_point`. **Terminal
+market** prices are secondary — useful as a break-even (BEP) reference to see
+what the downstream market is bearing against your shipping-point price.
+
+### Shipped charts
+
+| Chart | Breakdown | Source | Use |
+| ----- | --------- | ------ | --- |
+| **Shipping Point by Size** | avg price per `item_size` (48s, 60s…) | shipping_point | Sizing/packing decisions — bigger cherries usually clear a premium. |
+| **Shipping Point by Variety** | avg price per `variety` | shipping_point | Bing vs Rainier vs Sweetheart price differentiation. |
+| **Terminal Market by Origin** | avg price per `origin` | terminal_market | Where competing supply is coming from and what it's fetching downstream. |
+| **Weekly Average (Trend)** | avg `avg_price`, weekly time series | shipping_point | Season trend line for the shipping-point average. |
+
+### Shipped number cards
+
+- **Latest Cherry Shipping Price (avg)** — average shipping-point `avg_price` for
+  cherries over the most recent week.
+- **USDA Records Cached** — total count of cached USDA Market Price rows.
+
+### Filter note — `commodity_name LIKE %Cherr%`
+
+USDA labels cherry reports inconsistently (both **"Cherries"** and **"Sweet
+Cherries"** appear). Every chart/card filters with `commodity_name LIKE %Cherr%`
+so both variants are caught in one query.
+
+### Schema note — grouped charts
+
+Frappe's native Dashboard Chart has **no grouped time-series** (one line per
+group over time — that was Farm App's custom Chart.js). So the three "by
+Size / Variety / Origin" charts ship as **Group By bar charts** (`chart_type =
+Group By`, one bar per group value showing the average price), which is the
+native way to keep the per-group breakdown. Only the single-series **Weekly
+Average** is a true time series (`chart_type = Average`, `timeseries = 1`).
+
+### Adding your own charts
+
+You don't need to touch this app to add charts. Create a **Dashboard Chart** or
+**Number Card** in the desk UI (New → Dashboard Chart), point it at **USDA
+Market Price**, and drop it on any workspace. To fold a UI-created chart back
+into the app so it re-ships, add its name to the `fixtures` list in `hooks.py`
+and run `bench --site frontend export-fixtures --app farm_precision_ag`.
+
+The workspace itself auto-syncs from the app JSON on every `bench migrate` (via
+the existing `after_migrate` `workspace_sync` hook), so packaged tiles always
+reflect the shipped layout.
+
 ## Report types & slugs
 
 **Report types**
@@ -179,8 +237,11 @@ so a partial commodity name usually still resolves.
 
 ## Follow-ups (not in this release)
 
-- **Chart tile.** "Cherry Prices Last 30 Days" (line chart of `report_date` ×
-  `avg_price`) was scoped out of Phase B to keep the first workspace simple. Add
-  a Dashboard Chart on USDA Market Price later.
+- **Grouped time series.** The by-size / by-variety / by-origin charts ship as
+  Group By bar charts because stock Frappe can't do multi-line-per-group over
+  time. A true grouped time-series (Farm App's Chart.js look) would need a
+  custom chart source or a Query Report backing a Report-type Dashboard Chart.
+- **BEP overlay.** Overlaying terminal-market price on the shipping-point trend
+  for a live break-even read is a natural next chart.
 - Bake this app into the `fafo-erpnext` image (separate task, following the
   `farm_i9` Dockerfile pattern).
