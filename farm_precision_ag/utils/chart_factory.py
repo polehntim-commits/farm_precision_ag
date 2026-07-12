@@ -236,7 +236,25 @@ def _report_chart_spec(
         filters (not the ``[[doctype, field, op, val, meta]]`` list used by
         DocType charts). It pre-populates the report so the chart "just works"
         with no user interaction.
+      * ``filters``              — the Filter *child table*. On a Dashboard,
+        Frappe strips ``filters_json`` down to only the keys whose fieldname is
+        a field on ``ref_doctype`` (``USDA Market Price``), which drops
+        ``group_by`` (a report meta-parameter, not a column) and ``report_type``
+        — so the Script Report's ``execute()`` gets ``report_type`` empty and
+        bails to "No Data". Populating the child table too gets the full filter
+        set passed to the report verbatim; the boot monkey-patch
+        (``patch_report_execute_module``) normalizes the list-format rows Frappe
+        forwards back into a dict. Setting both is belt-and-suspenders: the
+        child table fixes the Dashboard render, ``filters_json`` keeps the
+        standalone/direct render working. Passed as a list in the spec so it
+        degrades harmlessly if this Frappe build has no ``filters`` table field
+        (unknown keys are ignored at insert).
     """
+    report_filters = {
+        "commodity_name": commodity,
+        "report_type": report_type,
+        "group_by": group_by,
+    }
     return {
         "name": f"USDA {commodity} - {name_suffix}",
         "chart_name": f"USDA {commodity} — {name_suffix}",
@@ -244,13 +262,11 @@ def _report_chart_spec(
         "type": chart_type,
         "report_name": TREND_REPORT,
         "use_report_chart": 1,
-        "filters_json": json.dumps(
-            {
-                "commodity_name": commodity,
-                "report_type": report_type,
-                "group_by": group_by,
-            }
-        ),
+        "filters_json": json.dumps(report_filters),
+        "filters": [
+            {"fieldname": fieldname, "condition": "=", "value": value}
+            for fieldname, value in report_filters.items()
+        ],
         "is_public": 1,
     }
 

@@ -34,19 +34,19 @@
    "fieldname": "from_date",
    "label": "From Date",
    "fieldtype": "Date",
-   "default": "frappe.datetime.add_days(frappe.datetime.get_today(), -90)"
+   "default": ""
   },
   {
    "fieldname": "to_date",
    "label": "To Date",
    "fieldtype": "Date",
-   "default": "frappe.datetime.get_today()"
+   "default": ""
   }
  ],
  "idx": 0,
  "is_standard": "Yes",
  "letter_head": null,
- "modified": "2026-07-11 00:00:00.000000",
+ "modified": "2026-07-12 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Precision Ag",
  "name": "USDA Price Trend by Grouping",

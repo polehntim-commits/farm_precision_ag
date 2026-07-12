@@ -4,3 +4,4 @@
 farm_precision_ag.patches.v0_3_0_backfill_charts
 farm_precision_ag.patches.v0_4_0_regenerate_charts
 farm_precision_ag.patches.v0_4_1_patch_report_execute_module
+farm_precision_ag.patches.v0_4_2_regenerate_charts_with_filter_table
